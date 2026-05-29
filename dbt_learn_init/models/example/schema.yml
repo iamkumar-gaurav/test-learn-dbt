@@ -1,0 +1,60 @@
+
+version: 2
+
+models:
+  - name: my_first_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null
+          
+
+  - name: my_second_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('my_first_dbt_model')
+                field: id
+  - name: snowflake_customer_purchase
+    description: "A model to calculate total purchase amount per customer"
+    columns:
+      - name: c_custkey
+        description: "Customer key"
+        data_tests:
+          - unique
+          - not_null
+      - name: c_name
+        description: "Customer name"
+      - name: nation
+        description: "Customer nation"
+      - name: total_order_price
+        description: "Total order price for the customer"
+        data_tests:
+            - not_null
+  - name: cumulative_orders_by_date
+    description: "A model to calculate cumulative sales by order date"
+    columns:
+      - name: o_orderdate
+        description: "Order date"
+      - name: daily_sales
+        description: "Total sales for the day"
+      - name: cumulative_sales
+        description: "Cumulative sales up to that date"     
+        data_tests:
+            - not_null
+            - unique
+  - name: incremental_time
+    description: "An incremental model to capture time data up to the current time of day"
+    columns:
+      - name: constructed_time
+        description: "Constructed time from T_HOUR, T_MINUTE, and T_SECOND"
+        
