@@ -21,10 +21,16 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
-vars:
-  my_first_variable: True
-  my_second_variable: 2020
-  my_third_variable: 2
+
+on-run-start: 
+  - "{{ log('dbt Pre-Hooks run has started!', info=True) }}"
+  - "create table if not exists audit(model_name text, status text, execution_time timestamp);"
+
+on-run-end:
+  - "{{ log('dbt run has finished!', info=True) }}"
+  - 'grant usage on schema analytics.dbt to analyst;'
+  - 'grant select on all tables in schema analytics.dbt to analyst;'
+  - 'grant select on all views in schema analytics.dbt to analyst'
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -34,7 +40,19 @@ vars:
 # files using the `{{ config(...) }}` macro.
 models:
   dbt_learn_init:
+    +pre-hook:
+      - "{{ log('dbt Pre-Hooks run has started!', info=True) }}"
+      - "insert into audit(model_name, status, execution_time) values ('{{ this.name }}', 'starting model deployment', current_timestamp);"
     # Config indicated by + and applies to all files under models/example/
     example:
       +materialized: table
 
+vars:
+  my_first_variable: True
+  my_second_variable: 2020
+  my_third_variable: 2
+
+  # post-hooks:
+  #   - "{{ log('dbt run has finished!', info=True) }}"
+  #   - 'grant usage on schema {{target.this}} to analyst;'
+  #   - 'grant select on {{this}} to analyst;'

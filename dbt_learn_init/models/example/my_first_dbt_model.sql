@@ -7,23 +7,26 @@
     Try changing "table" to "view" below
 */
 
-{{ config(materialized='table', alias='firstmodel_Deployment' , schema='test_deployment') }}
+{{ config(materialized='table', alias='firstmodel_Deployment' ) }}
 
 with source_data as (
 
-    select 1 as id
+    select 1 as id , 'IND' as state , '2020-02-01 10:01:00.000' :: timestamp as updated_at
     union all
-    select null as id
+    select null as id , 'CT' as state , '2020-01-01 00:00:00.000' :: timestamp as updated_at
+    union all 
+    select 3 as id , 'VT' as state , '2020-01-01 00:00:00.000' :: timestamp as updated_at
 
 )
 
-select *,{{ var('my_first_variable') }} as my_first_variable
+select *
 from source_data
 
-where id <={{var('my_third_variable')}}
-
 /*
-    Uncomment the line below to remove records with null `id` values
+    select *,{{ var('my_first_variable') }} as my_first_variable
+from source_data
+
+where id >={{var('my_third_variable')}}
 */
 
 -- where id is not null
